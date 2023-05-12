@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     //IapController
     public SoundController soundController;
     public GameData gameData;
+    public PrefabLoader prefabLoader;
     
     private void Awake()
     {

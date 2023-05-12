@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -15,6 +16,13 @@ public class Ball : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
+    private float maxY = 0f;
+    
+    private void Start()
+    {
+        maxY = GameplayController.Instance.levelController.numberOfStages;
+    }
+
     [Button]
     private void ForceUp()
     {
@@ -23,7 +31,20 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        ForceUp();
+        if (other.gameObject.tag == "Destination")
+        {
+            GameplayController.Instance.gameplayUIController.ToggleGameOverPanel(true, true);
+        }
+        if(other.gameObject.tag == "Hazard")
+        {
+            other.gameObject.SetActive(false);
+            var particle = Instantiate(GameController.Instance.prefabLoader.redPlatformDestroyEffect);
+            particle.transform.position = other.transform.position;
+        }
+        else
+        {
+            ForceUp();
+        }
     }
 
     public float maxVelocity = 0;
@@ -39,6 +60,14 @@ public class Ball : MonoBehaviour
         if (rb.velocity.y > maxVelocity)
         {
             maxVelocity = rb.velocity.y;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (transform.position.y <= -maxY - 1)
+        {
+            rb.isKinematic = true;
         }
     }
 }
